@@ -1,0 +1,1 @@
+# explicacio-cartell-festes-mic-2026
