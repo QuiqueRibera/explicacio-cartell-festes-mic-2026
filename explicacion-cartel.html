@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Anàlisi Visual - Cartell Moros i Cristians d'Alcoi 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prata&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reseteig bàsic i tipografia */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 1. PANTALLA NEGRA D'INTRODUCCIÓ AMB QUADRÍCULA */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: calc(100vw / 5) calc(100vh / 17);
+            background-position: center;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 1000;
+            padding: 2rem;
+            opacity: 1;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .intro-content-wrapper {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2.5rem;
+            border-radius: 0px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #fff;
+        }
+
+        #intro-overlay h1 {
+            font-family: 'Prata', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+            color: #fff;
+            text-transform: uppercase; 
+        }
+
+        #intro-overlay p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            color: #ccc;
+            max-width: 90%;
+            margin-bottom: 2rem;
+        }
+
+        /* Indicador de moviment */
+        .mouse-icon {
+            width: 30px;
+            height: 50px;
+            border: 2px solid #fff;
+            border-radius: 15px;
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .mouse-wheel {
+            width: 6px;
+            height: 6px;
+            background-color: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: mouseScroll 1.8s infinite;
+        }
+
+        @keyframes mouseScroll {
+            0% { top: 8px; opacity: 1; }
+            100% { top: 30px; opacity: 0; }
+        }
+
+        /* 2. CONTENEDOR PRINCIPAL */
+        .scrolly-container {
+            position: relative;
+            width: 100vw;
+        }
+
+        /* 3. IMATGE DE FONS */
+        .image-wrapper {
+            position: sticky;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1;
+            background-color: #000;
+        }
+
+        #poster {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transform-origin: center center;
+            transition: transform 2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* 4. SECCIÓ DE TEXTOS */
+        .text-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100vw;
+            pointer-events: none;
+        }
+
+        .step {
+            height: 200vh; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        .step-content {
+            margin-top: 50vh; 
+            transform: translateY(-50%);
+            
+            /* Fons negre translúcid */
+            background-color: rgba(0, 0, 0, 0.9);
+            
+            /* Quadrícula exacta: 4 línies verticals (cada 20%) i 10 línies horitzontals (cada 100/11%) */
+            background-image: 
+                repeating-linear-gradient(
+                    to right,
+                    transparent,
+                    transparent calc(20% - 1px),
+                    rgba(255, 255, 255, 0.05) calc(20% - 1px),
+                    rgba(255, 255, 255, 0.05) 20%
+                ),
+                repeating-linear-gradient(
+                    to bottom,
+                    transparent,
+                    transparent calc(100% / 11 - 1px),
+                    rgba(255, 255, 255, 0.05) calc(100% / 11 - 1px),
+                    rgba(255, 255, 255, 0.05) calc(100% / 11)
+                );
+            background-size: 100% 100%;
+            
+            backdrop-filter: blur(5px);
+            border: 2px solid #fff;
+            border-radius: 0px; 
+            padding: 2.5rem 2rem;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            opacity: 0.1;
+            transition: opacity 1s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+
+        .step.is-active .step-content {
+            opacity: 1;
+        }
+
+        .step-content h2 {
+            font-family: 'Prata', serif;
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .step-content p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #ddd;
+        }
+
+        .outro-space {
+            height: 50vh;
+            background: #000;
+            position: relative;
+            z-index: 3;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="intro-overlay">
+        <div class="intro-content-wrapper">
+            <h1>Anàlisi del Cartell</h1>
+            <p>Festes de Moros i Cristians d'Alcoi 2026. Disseny per 'La Taula'.</p>
+            <p style="margin-top: 1rem; font-size: 1.1rem; color: #aaa;">Comença l'experiència:</p>
+            <div class="mouse-icon">
+                <div class="mouse-wheel"></div>
+            </div>
+            <p style="font-size: 0.9rem; color: #aaa; margin-top: 0.5rem; margin-bottom: 0;">Desliza cap avall</p>
+        </div>
+    </div>
+
+    <div class="scrolly-container">
+        
+        <div class="image-wrapper">
+            <img id="poster" src="https://www.aramultimedia.com/upload/2026/MARC-26/Cartell-Festes-de-Moros-i-Cristians-en-Honor-a-Sant-Jordi-2026---La-Taula.jpeg" alt="Cartell Fiestas d'Alcoy 2026 - La Taula">
+        </div>
+
+        <div class="text-wrapper">
+            
+            <div class="step" data-scale="1" data-x="0" data-y="0">
+                <div class="step-content">
+                    <h2>Composició General</h2>
+                    <p>Amb motiu del 750 aniversari del patronatge de Sant Jordi, el protagonista del cartell és, de forma central i simbòlica, el nostre patró. Es presenta com una figura que també celebra aquesta efemèride, projectant orgull, solemnitat i victòria.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="1" data-x="0" data-y="0">
+                <div class="step-content">
+                    <h2>Estil Geomètric</h2>
+                    <p>La seua representació adopta un estil geomètric, quasi escultòric, que reforça el seu caràcter icònic i atemporal. Vesteix la indumentària clàssica de Sant Jordi, però reinterpretada amb una mirada contemporània: una figura jove, enèrgica i guerrera, captada en el seu moment de major exaltació.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="1" data-x="0" data-y="0">
+                <div class="step-content">
+                    <h2>Color</h2>
+                    <p>L'ús del blanc i negre transmet solemnitat, respecte i atemporalitat, allunyant-se deliberadament dels colors més associats a les festes de Moros i Cristians, com el roig i el verd. Aquesta elecció cromàtica centra l'atenció en la figura de Sant Jordi i en la seua càrrega simbòlica.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="2" data-x="0" data-y="35">
+                <div class="step-content">
+                    <h2>El Títol Principal</h2>
+                    <p>El títol principal, “ALCOI”, adquireix un paper destacat, reforçant la identitat de la ciutat i el seu protagonisme en els seus dies més significatius. La tipografia combina trets tradicionals —com els remats amb serifa— amb una renovació formal en els traços i un contrast entre rectes estretes i corbes amples.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="2.5" data-x="10" data-y="25">
+                <div class="step-content">
+                    <h2>El Confeti</h2>
+                    <p>El confeti introdueix la dimensió festiva, popular i participativa del cartell. Representa l'alegria col·lectiva i actua com a nexe entre el poble i la figura del patró, integrant allò solemne amb allò celebratiu.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="2.5" data-x="-10" data-y="20">
+                <div class="step-content">
+                    <h2>Llums i Ombres</h2>
+                    <p>A més, el contrast entre llums i ombres potencia el volum de la figura i permet que elements dinàmics, com el confeti, adquirisquen major protagonisme visual.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="2.5" data-x="15" data-y="10">
+                <div class="step-content">
+                    <h2>Interacció i Color</h2>
+                    <p>Aquest element també remet a la interacció entre públic i festers, evocant moments característics de la festa, com els associats a la filà dels “mirons”. La seua coloració respon al sistema CMYK (cian, magenta, groc i negre), propi de la impressió gràfica.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="2.5" data-x="-5" data-y="15">
+                <div class="step-content">
+                    <h2>Accessibilitat</h2>
+                    <p>Aquesta combinació de colors, a més a més, genera menys conflictes visuals amb persones amb dificultats visuals, com els daltònics, en no tindre tanta càrrega visual de color.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="3" data-x="10" data-y="0">
+                <div class="step-content">
+                    <h2>Sant Jordi i els Gremis</h2>
+                    <p>En la figura protagonista, especialment en la seua zona més ombrívola, s'aprecien diferents textures que simbolitzen els gremis i oficis que fan possible la festa. Representen a tots aquells que treballen des d'un segon pla.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="3" data-x="10" data-y="0">
+                <div class="step-content">
+                    <h2>Capes de Lectura</h2>
+                    <p>Aquestes textures generen capes de lectura dins del cartell, aportant profunditat conceptual i visual. L'obra no sols es contempla, sinó que també es descobreix.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="4" data-x="0" data-y="28">
+                <div class="step-content">
+                    <h2>Serveis Públics</h2>
+                    <p>Simulació de pèls de granera: representa la gent de neteja que s'encarrega que es puga dur a terme la festa de forma higiènica.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="4" data-x="5" data-y="18">
+                <div class="step-content">
+                    <h2>Arts Escèniques</h2>
+                    <p>Arts escèniques o danses: un tros de tela decorativa que recorda els espectacles i ballets que enriqueixen la desfilada.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="4" data-x="-12" data-y="10">
+                <div class="step-content">
+                    <h2>Hípica i Animals</h2>
+                    <p>Hípica i animals: petjades de rastres en terra que fan al·lusió als cavalls i esquadres que recorren els carrers d'Alcoi.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="4" data-x="-15" data-y="0">
+                <div class="step-content">
+                    <h2>Perruqueria i Maquillatge</h2>
+                    <p>Detalls que evoquen el treball fonamental de perruqueria i maquillatge, essencial per a la caracterització de cada filà.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="4" data-x="0" data-y="-10">
+                <div class="step-content">
+                    <h2>Música i Himne</h2>
+                    <p>Música: unes partitures de l'himne de festes camuflades entre els traços geomètrics, ànima de la celebració.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="4" data-x="5" data-y="-15">
+                <div class="step-content">
+                    <h2>Audiovisuals i Premsa</h2>
+                    <p>Elements que representen el treball d'audiovisuals i premsa, els encarregats d'immortalitzar cada moment de la trilogia.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="4" data-x="0" data-y="-20">
+                <div class="step-content">
+                    <h2>Disseny i Confecció</h2>
+                    <p>Traços propis del món tèxtil: dissenyadors i confecció, pilars que donen color i forma a la indumentària d'Alcoi.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="4" data-x="0" data-y="-28">
+                <div class="step-content">
+                    <h2>Metalls i Artesania</h2>
+                    <p>A la base de la malla: el món dels metalls i l'artesania que dóna vida a les armes, escuts i carrosses.</p>
+                </div>
+            </div>
+
+            <div class="step" data-scale="1" data-x="0" data-y="0">
+                <div class="step-content">
+                    <h2>El Llegat de 'La Taula'</h2>
+                    <p>Cadascun d'aquests detalls ha sigut creat pels 8 joves creadors del cartell, deixant la seua empremta en una creació col·lectiva.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const introOverlay = document.getElementById('intro-overlay');
+            const steps = document.querySelectorAll('.step');
+            const poster = document.getElementById('poster');
+
+            function handleScroll() {
+                if (window.scrollY > 50) { 
+                    introOverlay.style.opacity = '0';
+                    introOverlay.style.visibility = 'hidden';
+                    window.removeEventListener('scroll', handleScroll);
+                }
+            }
+            window.addEventListener('scroll', handleScroll);
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '-50% 0px -50% 0px', 
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        steps.forEach(s => s.classList.remove('is-active'));
+                        entry.target.classList.add('is-active');
+
+                        const scale = entry.target.getAttribute('data-scale');
+                        const x = entry.target.getAttribute('data-x');
+                        const y = entry.target.getAttribute('data-y');
+
+                        poster.style.transform = `scale(${scale}) translate(${x}%, ${y}%)`;
+                    }
+                });
+            }, observerOptions);
+
+            steps.forEach(step => observer.observe(step));
+        });
+    </script>
+</body>
+</html>
