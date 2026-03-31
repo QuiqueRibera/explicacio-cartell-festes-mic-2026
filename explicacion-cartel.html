@@ -22,6 +22,8 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             overscroll-behavior: contain;
+            /* BLOQUEIG DE SCROLL INICIAL */
+            overflow-y: hidden !important; 
         }
 
         /* 1. PANTALLA NEGRA D'INTRODUCCIÓ AMB QUADRÍCULA */
@@ -48,6 +50,7 @@
             padding: 2rem;
             opacity: 1;
             transition: opacity 1s ease, visibility 1s ease;
+            cursor: pointer; /* Fa que tota la pantalla semble clicable */
         }
 
         .intro-content-wrapper {
@@ -58,6 +61,11 @@
             flex-direction: column;
             align-items: center;
             border: 2px solid #fff;
+            transition: transform 0.2s ease;
+        }
+        
+        #intro-overlay:active .intro-content-wrapper {
+            transform: scale(0.98);
         }
 
         #intro-overlay h1 {
@@ -69,7 +77,7 @@
             text-transform: uppercase; 
         }
 
-        #intro-overlay p {
+        #intro-overlay p.subtitle {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.1rem;
             color: #ccc;
@@ -77,14 +85,37 @@
             margin-bottom: 2rem;
         }
 
-        /* Indicador de moviment */
+        /* Fals botó estètic (ghost button) */
+        .fake-btn {
+            margin-top: 0.5rem;
+            padding: 12px 28px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        #intro-overlay:hover .fake-btn {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Indicador de moviment original */
         .mouse-icon {
             width: 30px;
             height: 50px;
             border: 2px solid #fff;
             border-radius: 15px;
             position: relative;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
 
         .mouse-wheel {
@@ -155,10 +186,8 @@
             margin-top: 50vh; 
             transform: translateY(-50%);
             
-            /* Fons negre translúcid */
             background-color: rgba(0, 0, 0, 0.9);
             
-            /* Quadrícula exacta: 4 línies verticals (cada 20%) i 10 línies horitzontals (cada 100/11%) */
             background-image: 
                 repeating-linear-gradient(
                     to right,
@@ -222,19 +251,23 @@
     <div id="intro-overlay">
         <div class="intro-content-wrapper">
             <h1>Anàlisi del Cartell</h1>
-            <p>Festes de Moros i Cristians d'Alcoi 2026. Dissenyat per 'La Taula'.</p>
-            <p style="margin-top: 1rem; font-size: 1.1rem; color: #aaa;">Comença l'experiència:</p>
+            <p class="subtitle">Festes de Moros i Cristians d'Alcoi 2026. Dissenyat per 'La Taula'.</p>
+            
+            <div class="fake-btn">Toca per començar</div>
+            
             <div class="mouse-icon">
                 <div class="mouse-wheel"></div>
             </div>
-            <p style="font-size: 0.9rem; color: #aaa; margin-top: 0.5rem; margin-bottom: 0;">Desliza cap avall</p>
+            
+            <p style="font-size: 0.9rem; color: #aaa; margin-top: 0.8rem; margin-bottom: 0;">I després fes scroll cap avall</p>
         </div>
     </div>
 
     <div class="scrolly-container">
         
         <div class="image-wrapper">
-            <img id="poster" src="img/Cartell_2k26_MiC_Alcoi.jpg" alt="Cartell Fiestas d'Alcoy 2026 - La Taula">        </div>
+            <img id="poster" src="img/Cartell_2k26_MiC_Alcoi.jpg" alt="Cartell Fiestas d'Alcoy 2026 - La Taula">        
+        </div>
 
         <div class="text-wrapper">
             
@@ -373,44 +406,36 @@
             const steps = document.querySelectorAll('.step');
             const poster = document.getElementById('poster');
 
-            function handleScroll() {
-                if (window.scrollY > 50) { 
-                    introOverlay.style.opacity = '0';
-                    introOverlay.style.visibility = 'hidden';
-                    window.removeEventListener('scroll', handleScroll);
-                }
-            }
-            window.addEventListener('scroll', handleScroll);
+            let hasScrolledPastIntro = false;
 
+            // 1. GESTIÓ DEL CLIC A LA PANTALLA
+            introOverlay.addEventListener('click', () => {
+                document.body.style.setProperty('overflow-y', 'auto', 'important');
+                introOverlay.style.opacity = '0';
+                introOverlay.style.visibility = 'hidden';
+            });
+
+            // 2. GESTIÓ INTEL·LIGENT DEL SCROLL (Tornar a dalt)
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 150) {
+                    hasScrolledPastIntro = true;
+                }
+
+                if (hasScrolledPastIntro && window.scrollY <= 10) { 
+                    introOverlay.style.visibility = 'visible';
+                    introOverlay.style.opacity = '1';
+                    document.body.style.setProperty('overflow-y', 'hidden', 'important');
+                    hasScrolledPastIntro = false;
+                    window.scrollTo(0, 0);
+                }
+            });
+
+            // 3. MOTOR DE ZOOMS I INTERSECCIÓ
             const observerOptions = {
                 root: null,
                 rootMargin: '-50% 0px -50% 0px', 
                 threshold: 0
-            }
-                // --- CERRADURA DE SCROLL: Evitar que el iframe robe el dedo antes de tiempo ---
-    
-    // 1. Bloqueamos el scroll interno del iframe por defecto
-    document.body.style.overflowY = 'hidden';
-
-    const visibilityObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            // intersectionRatio mide qué porcentaje del iframe se ve en la pantalla principal (de 0 a 1)
-            // Usamos 0.85 (85%) para dar un pequeño margen por las barras de navegación de los móviles
-            if (entry.intersectionRatio > 0.85) {
-                // Cuando el iframe ya ocupa la pantalla, desbloqueamos tu interactivo
-                document.body.style.overflowY = 'auto'; 
-            } else {
-                // Si el usuario pasa de largo el interactivo, lo volvemos a bloquear
-                document.body.style.overflowY = 'hidden'; 
-            }
-        });
-    }, {
-        root: null, // Esto permite al iframe "espiar" la ventana principal del periódico
-        threshold: [0, 0.2, 0.5, 0.85, 1] // Le pedimos que nos avise en estos porcentajes
-    });
-
-    // Ponemos al vigilante a observar todo el documento del iframe
-    visibilityObserver.observe(document.documentElement);
+            };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
