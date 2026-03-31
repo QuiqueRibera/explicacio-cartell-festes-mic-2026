@@ -386,7 +386,31 @@
                 root: null,
                 rootMargin: '-50% 0px -50% 0px', 
                 threshold: 0
-            };
+            }
+                // --- CERRADURA DE SCROLL: Evitar que el iframe robe el dedo antes de tiempo ---
+    
+    // 1. Bloqueamos el scroll interno del iframe por defecto
+    document.body.style.overflowY = 'hidden';
+
+    const visibilityObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            // intersectionRatio mide qué porcentaje del iframe se ve en la pantalla principal (de 0 a 1)
+            // Usamos 0.85 (85%) para dar un pequeño margen por las barras de navegación de los móviles
+            if (entry.intersectionRatio > 0.85) {
+                // Cuando el iframe ya ocupa la pantalla, desbloqueamos tu interactivo
+                document.body.style.overflowY = 'auto'; 
+            } else {
+                // Si el usuario pasa de largo el interactivo, lo volvemos a bloquear
+                document.body.style.overflowY = 'hidden'; 
+            }
+        });
+    }, {
+        root: null, // Esto permite al iframe "espiar" la ventana principal del periódico
+        threshold: [0, 0.2, 0.5, 0.85, 1] // Le pedimos que nos avise en estos porcentajes
+    });
+
+    // Ponemos al vigilante a observar todo el documento del iframe
+    visibilityObserver.observe(document.documentElement);;
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
